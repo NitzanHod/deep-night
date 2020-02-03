@@ -63,9 +63,9 @@ def run(handlers_cfg, train_cfg):
                "Luminance_MS_SSIM": MeanMSSSIMLuminance()}
 
     train_evaluator = create_supervised_evaluator(model, metrics=metrics)
-    attach_eval_events(trainer, train_evaluator, train_dataloader, writer, "Train")
+    attach_eval_events(trainer, model, train_evaluator, train_dataloader, writer, "Train")
 
     val_evaluator = create_supervised_evaluator(model, metrics=metrics)
-    attach_eval_events(trainer, val_evaluator, eval_dataloader, writer, "Val")
+    attach_eval_events(trainer, model, val_evaluator, eval_dataloader, writer, "Val")
 
     trainer.run(train_dataloader, train_cfg['max_epochs'])
