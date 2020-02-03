@@ -1,3 +1,3 @@
 # Mantis Research
 
-Let's do this
+Research infrastructure for denoising and similar computer vision problems using deep learning
