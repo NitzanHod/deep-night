@@ -2,7 +2,7 @@
   "train_cfg":  {
                 "model": "cfg/model_cfg/orig_u_net.cfg",
                 // why no comments?
-                "max_epochs": 4000,
+                "max_epochs": 5,
                 // optimizer parms
                 "optimizer_type": "Adam",
                 "initial_lr": 1e-4,
@@ -20,8 +20,8 @@
 
 
   "handlers_cfg": {
-                  "dirname": "sid_vanilla",
-                  "filename_prefix": "sid_vanilla",
+                  "dirname": "testing",
+                  "filename_prefix": "testing",
                   "save_interval": 1,
                   "n_saved": 10,
                   "multi_gpu": true,
@@ -32,8 +32,8 @@
                   },
 
   "dataloader_cfg": {
-                    "train_csv_file": "dataset/Sony_train_list.txt",
-                    "eval_csv_file": "dataset/Sony_val_list.txt",
+                    "train_csv_file": "dataset/tiny_Sony_train_list.txt",
+                    "eval_csv_file": "dataset/tiny_Sony_val_list.txt",
                     "root_dir": "/home/dsteam/Desktop",
                     "black_level": 512,
                     "stack_bayer": true,

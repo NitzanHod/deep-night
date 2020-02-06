@@ -4,20 +4,26 @@ from utils.train_utils.engine_handlers import handlers_ingredient, attach_traine
 from utils.train_utils.dataloader import dataloader_ingredient, get_dataloaders
 from utils.train_utils.optimizer import optimizer_ingredient, get_optimizer
 from utils.train_utils.lr_scheduer import lr_scheduler_ingredient, get_lr_scheduler
+from utils.train_utils.loss_function import loss_ingredient
+from utils.train_utils.custom_error_metrics import PeakSignalToNoiseRatio, MeanDeepISPError, MeanMSSSIMLuminance
+from utils.train_utils.cuda_utils import set_cuda
+
+from utils.models import NNFactory
 
 from utils.sid_engine import engines_ingredient, create_supervised_evaluator, create_supervised_trainer
-from utils.train_utils.loss_function import loss_ingredient, get_loss_function
-from utils.train_utils.custom_error_metrics import PeakSignalToNoiseRatio, MeanDeepISPError, MeanMSSSIMLuminance
+
 from ignite.metrics import MeanSquaredError, MeanAbsoluteError
+
 import hjson
 import os
 import torch
-from tensorboardX import SummaryWriter
-from utils.train_utils.cuda_utils import set_cuda
-from torch.nn import L1Loss
-from utils.models import NNFactory
 
-CFG_PATH = "cfg/full_cfg_sid.json"
+from tensorboardX import SummaryWriter
+
+from torch.nn import L1Loss
+from utils.cfg_utils import ExperimentManager
+
+CFG_PATH = ExperimentManager('test').get_cfg()
 
 ex = Experiment(ingredients=[engines_ingredient,
                              handlers_ingredient,
@@ -51,16 +57,14 @@ def run(handlers_cfg, train_cfg):
 
     scheduler = get_lr_scheduler(optimizer)
 
-    # criterion = loss_function
-    # criterion = get_loss_function()
     criterion = L1Loss()
-
-    trainer = create_supervised_trainer(model, optimizer, criterion)
-    attach_trainer_events(trainer, model, optimizer=optimizer, scheduler=scheduler)
 
     metrics = {"L1": MeanAbsoluteError(), "L2": MeanSquaredError(),
                "PSNR": PeakSignalToNoiseRatio(), "DeepISP_Loss": MeanDeepISPError(),
                "Luminance_MS_SSIM": MeanMSSSIMLuminance()}
+
+    trainer = create_supervised_trainer(model, optimizer, criterion)
+    attach_trainer_events(trainer, model, optimizer=optimizer, scheduler=scheduler)
 
     train_evaluator = create_supervised_evaluator(model, metrics=metrics)
     attach_eval_events(trainer, model, train_evaluator, train_dataloader, writer, "Train")

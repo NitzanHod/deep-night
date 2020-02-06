@@ -1,0 +1,2 @@
+./Sony/short/20005_00_0.04s.ARW ./Sony/long/20005_00_10s.ARW ISO200 F13
+./Sony/short/20005_00_0.1s.ARW ./Sony/long/20005_00_10s.ARW ISO200 F13
