@@ -2,6 +2,7 @@ import torch
 from torchvision import transforms
 import numpy as np
 
+
 def new_flip(x, dim):
     return torch.flip(x, [dim])
 
@@ -82,17 +83,16 @@ class ToTensor(object):
 
 def get_train_transform(crop_size=512, stack_bayer=False):
     transform = transforms.Compose(
-                                  [RandomCrop(crop_size, stack_bayer=stack_bayer),
-                                   ToTensor(),
-                                   RandomFlips()]
-                                  )
+        [RandomCrop(crop_size, stack_bayer=stack_bayer),
+         ToTensor(),
+         RandomFlips()]
+    )
     return transform
 
 
 def get_eval_transform(crop_size=512, stack_bayer=False):
-
     transform = transforms.Compose(
-                                  [RandomCrop(crop_size, stack_bayer=stack_bayer),
-                                   ToTensor()]
-                                  )
+        [RandomCrop(crop_size, stack_bayer=stack_bayer),
+         ToTensor()]
+    )
     return transform

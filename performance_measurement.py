@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import time,os
 import numpy as np
 import rawpy
-from utils.train_utils.dataloader import raw2np, pack_raw
+from utils.train_utils.dataloaders import raw2np, pack_raw
 
 
 dtype, device = set_cuda()

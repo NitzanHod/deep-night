@@ -1,25 +1,13 @@
 import os
-from datetime import time
+import random
 
 import numpy as np
-import torch
-import random
-import time
-import rawpy
-from torch.utils.data import Dataset, DataLoader
-from utils.train_utils.data_transforms import get_train_transform, get_eval_transform
-from sacred import Ingredient
 import pandas as pd
-import hjson
+import rawpy
+import torch
+from torch.utils.data import Dataset, DataLoader
 
-import matplotlib.pyplot as plt
-CFG_PATH = "cfg/full_cfg_sid.json"
-
-dataloader_ingredient = Ingredient('dataloader')
-# handlers_ingredient.add_config(CFG_PATH)
-
-with open(CFG_PATH) as f:
-    dataloader_ingredient.add_config(hjson.load(f))
+from utils.train_utils.data_transforms import get_train_transform, get_eval_transform
 
 
 def raw2np(raw, black_level):
@@ -104,18 +92,24 @@ class SIDDataset(Dataset):
         return sample['image'], sample['ground_truth']
 
 
-@dataloader_ingredient.capture(prefix="dataloader_cfg")
-def get_dataloaders(train_csv_file, eval_csv_file, root_dir, black_level, stack_bayer, subset, crop_size, batch_size,
-                    shuffle, num_workers, pin_memory):
-    train_transform = get_train_transform(crop_size=crop_size, stack_bayer=stack_bayer)
-    eval_transform = get_eval_transform(crop_size=crop_size, stack_bayer=stack_bayer)
-    train_dataset = SIDDataset(train_csv_file, root_dir, transform=train_transform, black_level=black_level,
-                               stack_bayer=stack_bayer, subset=subset)
-    eval_dataset = SIDDataset(eval_csv_file, root_dir, transform=eval_transform, black_level=black_level,
-                              stack_bayer=stack_bayer, subset=subset)
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=shuffle,
-                                  num_workers=num_workers, pin_memory=pin_memory)
-    eval_dataloader = DataLoader(dataset=eval_dataset, batch_size=batch_size, shuffle=shuffle,
-                                 num_workers=num_workers, pin_memory=pin_memory)
+class DataloadersComponent:
 
-    return train_dataloader, eval_dataloader
+    def __init__(self, ingredient):
+        @ingredient.capture(prefix="dataloader_cfg")
+        def get_dataloaders(train_csv_path, eval_csv_path, root_dir, black_level, stack_bayer, subset, crop_size,
+                            batch_size,
+                            shuffle, num_workers, pin_memory):
+            train_transform = get_train_transform(crop_size=crop_size, stack_bayer=stack_bayer)
+            eval_transform = get_eval_transform(crop_size=crop_size, stack_bayer=stack_bayer)
+            train_dataset = SIDDataset(train_csv_path, root_dir, transform=train_transform, black_level=black_level,
+                                       stack_bayer=stack_bayer, subset=subset)
+            eval_dataset = SIDDataset(eval_csv_path, root_dir, transform=eval_transform, black_level=black_level,
+                                      stack_bayer=stack_bayer, subset=subset)
+            train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=shuffle,
+                                          num_workers=num_workers, pin_memory=pin_memory)
+            eval_dataloader = DataLoader(dataset=eval_dataset, batch_size=batch_size, shuffle=shuffle,
+                                         num_workers=num_workers, pin_memory=pin_memory)
+
+            return train_dataloader, eval_dataloader
+
+        self.methods = [get_dataloaders]
