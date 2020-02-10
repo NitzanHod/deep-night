@@ -1,3 +1,5 @@
+ignite
+PyYAML
 torch
 absl-py==0.6.1
 arff==0.9

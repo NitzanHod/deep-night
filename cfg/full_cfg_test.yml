@@ -1,43 +1,43 @@
 ---
-TRAIN:
-    Model: cfg/model_cfg/orig_u_net.cfg
-    MaxEpoch: 5
-    Optimizer:
-        OptimizerType: Adam
-        LearningRate: 1e-4
-        Momentum: 0.9
-        WeightDecay: 0
-    Scheduler:
-        SchedulerType: steps
-        StepSize: 2000
-        Gamma: 0.1
-        FP16Train: True # train with half precision
-        LossFunction: L1 # criterion
+train_cfg:
+    model: cfg/model_cfg/orig_u_net.cfg
+    max_epochs: 5
 
-HANDLERS:
-    Dirname: testing
-    FilenamePrefix: testing
-    SaveInterval: 1
-    NumSaved: 10
-    MultiGPU: True
-    Patience: 1000
-    ScoreFunctionName: L1
-    ScoreIsLoss: True
-    Resume: True
+    # Optimizer
+    optimizer_type: Adam
+    initial_lr: 1e-4
+    momentum: 0.9
+    weight_decay: 0
 
+    # Scheduler:
+    scheduler_type: steps
+    step_size: 2000
+    gamma: 0.1
+    half_precision: True # train with half precision
+    loss_fn: L1 # criterion
 
-DATALOADER:
-    TrainPath: dataset/tiny_Sony_train_list.txt
-    EvalPath: dataset/tiny_Sony_val_list.txt
-    RootDir: /home/dsteam/Desktop
-    SID:
-      BlackLevel: 512
-      StackBayer: True
-    Subset: 1
-    CropSize: 512
-    BatchSize: 2 # see https://github.com/cchen156/Learning-to-See-in-the-Dark/issues/16
-    Shuffle: True
-    NumWorkers: 0
-    PinMemory: True
+handlers_cfg:
+    dirname: testing
+    filename_prefix: testing
+    save_interval: 1
+    n_saved: 10
+    multi_gpu: True
+    patience: 1000
+    score_function_name: L1
+    score_is_loss: True
+    resume: True
 
+dataloader_cfg:
+    train_csv_path: dataset/tiny_Sony_train_list.txt
+    eval_csv_path: dataset/tiny_Sony_val_list.txt
+    root_dir: /home/dsteam/Desktop
+    subset: 1
+    crop_size: 512
+    batch_size: 2 # see https://github.com/cchen156/Learning-to-See-in-the-Dark/issues/16
+    shuffle: True
+    num_workers: 0
+    pin_memory: True
 
+    # SID
+    black_level: 512
+    stack_bayer: True
