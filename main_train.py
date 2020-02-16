@@ -49,9 +49,9 @@ if __name__ == '__main__':
         exp_manager.attach_trainer_events(trainer, model, optimizer=optimizer, scheduler=scheduler)
 
         train_evaluator = exp_manager.create_supervised_evaluator(model, metrics=metrics)
-        exp_manager.attach_eval_events(trainer, model, train_evaluator, train_dataloader, writer, "Train")
+        exp_manager.attach_eval_events(trainer, model, train_evaluator, train_dataloader, writer, "Eval Train")
 
         val_evaluator = exp_manager.create_supervised_evaluator(model, metrics=metrics)
-        exp_manager.attach_eval_events(trainer, model, val_evaluator, eval_dataloader, writer, "Val")
+        exp_manager.attach_eval_events(trainer, model, val_evaluator, eval_dataloader, writer, "Eval Val")
 
         trainer.run(train_dataloader, train_cfg['max_epochs'])

@@ -1,5 +1,6 @@
 import os
 import random
+import time
 
 import numpy as np
 import pandas as pd
@@ -8,7 +9,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 
 from utils.train_utils.data_transforms import get_train_transform, get_eval_transform
-
+import matplotlib.pyplot as plt
 
 def raw2np(raw, black_level):
     im = raw.raw_image_visible.astype(np.float16)
@@ -52,7 +53,10 @@ class SIDDataset(Dataset):
     def __len__(self):
         return len(self.images_frame)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx, timing=False):
+        t = {}
+        t[0] = time.time()
+
         im_path = self.root_dir + self.images_frame.iloc[idx, 0][1:]
         gt_path = self.root_dir + self.images_frame.iloc[idx, 1][1:]
         _, im_fn = os.path.split(im_path)
@@ -61,33 +65,56 @@ class SIDDataset(Dataset):
         gt_exposure = float(gt_fn[9:-5])
         ratio = min(gt_exposure / im_exposure, 300)
 
+        t[1] = time.time()
         if im_path in self.im_dict.keys():
             im = self.im_dict[im_path] * ratio
+            # print('in image was restored',os.path.split(im_path)[-1])
         else:
             raw = rawpy.imread(im_path)
+            # print('in image was read',os.path.split(im_path)[-1])
             im = raw2np(raw, self.black_level)
             if self.stack_bayer:
                 im = pack_raw(im)
             self.im_dict[im_path] = im
             im *= ratio
+        t[2] = time.time()
         im = im.astype(np.float32)
+        t[3] = time.time()
 
         if gt_path in self.gt_dict.keys():
             gt = self.gt_dict[gt_path]
+            # print('gt image was restored',os.path.split(gt_path)[-1])
         else:
             gt_raw = rawpy.imread(gt_path)
+            # print('gt image was read',os.path.split(gt_path)[-1])
             gt = gt_raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=True, output_bps=16)
             gt = np.float16(gt / 65535.0)
+            gt = gt.astype(np.float32)
             self.gt_dict[gt_path] = gt
-        gt = gt.astype(np.float32)
+        t[4] = time.time()
+
+        t[5] = time.time()
 
         sample = {'image': im, 'ground_truth': gt}
-
+        t[6] = time.time()
         if self.transform:
             random.seed(0)
             np.random.seed(0)
             torch.random.manual_seed(0)
             sample = self.transform(sample)
+        t[7] = time.time()
+
+        if timing:
+            tv = list(t.values())
+            tk = list(t.keys())
+            dt = [x-y for x, y in zip(tv[1:], tv[:-1])]
+            dt_ticks = [f'{x}-{y}' for x, y in zip(tk[1:], tk[:-1])]
+            plt.title(f'total time: {round(tv[-1]-tv[0],4)}')
+            plt.xticks(tk[1:], dt_ticks)
+            plt.plot(tk[1:], dt)
+            for a, b in zip(tk[1:], dt):
+                plt.text(a, b, str(round(b, 2)))
+            plt.show()
 
         return sample['image'], sample['ground_truth']
 

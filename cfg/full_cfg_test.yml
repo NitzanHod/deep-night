@@ -1,7 +1,7 @@
 ---
 train_cfg:
     model: cfg/model_cfg/orig_u_net.cfg
-    max_epochs: 5
+    max_epochs: 3
 
     # Optimizer
     optimizer_type: Adam
@@ -25,11 +25,11 @@ handlers_cfg:
     patience: 1000
     score_function_name: L1
     score_is_loss: True
-    resume: True
+    resume: False
 
 dataloader_cfg:
-    train_csv_path: dataset/tiny_Sony_train_list.txt
-    eval_csv_path: dataset/tiny_Sony_val_list.txt
+    train_csv_path: dataset/med_Sony_train_list.txt
+    eval_csv_path: dataset/med_Sony_val_list.txt
     root_dir: /home/dsteam/Desktop
     subset: 1
     crop_size: 512
