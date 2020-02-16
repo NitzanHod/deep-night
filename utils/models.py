@@ -40,6 +40,23 @@ def create_modules(module_defs):
             if bn:
                 modules.add_module('batch_norm_%d' % i, nn.BatchNorm2d(filters))
 
+        elif module_def['type'] == 'deconvolutional':
+            filters = int(module_def['filters'])
+            kernel_size = int(module_def['size'])
+            stride = int(module_def['stride'])
+            pad = (kernel_size - 1) // 2 if int(module_def['pad']) else 0
+            groups = 1
+            module = nn.ConvTranspose2d(in_channels=output_filters[-1],
+                                        out_channels=filters,
+                                        kernel_size=kernel_size,
+                                        stride=stride,
+                                        padding=pad,
+                                        groups=groups,
+                                        bias=True)
+
+            modules.add_module('deconv_%d' % i, module)
+
+
         elif module_def['type'] == 'maxpool':
             kernel_size = int(module_def['size'])
             stride = int(module_def['stride'])
@@ -64,24 +81,19 @@ def create_modules(module_defs):
 
         # shortcut sums channels
         elif module_def['type'] == 'shortcut':
-            filters = output_filters[int(module_def['from'])]
+
+            layers = [int(x) for x in module_def['layers'].split(',')]
+            if len(layers) == 1:
+                layers = [-1] + layers
+            filter_sizes = set([output_filters[x] for x in layers])
+
+            # assert all layers have the same number of filters
+            assert len(filter_sizes) == 1, f"All sizes must be the same for addition! Sizes are {filter_sizes}"
+
+            filters = list(filter_sizes)[0]
+
             modules.add_module('shortcut_%d' % i, EmptyLayer())
 
-        elif module_def['type'] == 'deconvolutional':
-            filters = int(module_def['filters'])
-            kernel_size = int(module_def['size'])
-            stride = int(module_def['stride'])
-            pad = (kernel_size - 1) // 2 if int(module_def['pad']) else 0
-            groups = 1
-            module = nn.ConvTranspose2d(in_channels=output_filters[-1],
-                                        out_channels=filters,
-                                        kernel_size=kernel_size,
-                                        stride=stride,
-                                        padding=pad,
-                                        groups=groups,
-                                        bias=True)
-
-            modules.add_module('deconv_%d' % i, module)
 
         elif module_def['type'] == 'pixel_shuffle':
             filters = 3
@@ -187,7 +199,7 @@ class NNFactory(nn.Module):
             mtype = module_def['type']
             mod_tic = time.time()
             # print(mtype, x.size())
-            if mtype in ['upsample', 'maxpool', 'avgpool', 'linear', 'rgb_lab_converter', 'noop','convolutional',
+            if mtype in ['upsample', 'maxpool', 'avgpool', 'linear', 'rgb_lab_converter', 'noop', 'convolutional',
                          'mean', 'deepisp_block', 'pixel_shuffle','linear_packed', 'deconvolutional']:
                 x = module(x)
             elif mtype == 'route':
@@ -203,8 +215,11 @@ class NNFactory(nn.Module):
                     x = torch.cat([layer_outputs[i] for i in layer_i], 1)
 
             elif mtype == 'shortcut':
-                layer_i = int(module_def['from'])
-                x = layer_outputs[-1] + layer_outputs[layer_i]
+
+                layers = [int(x) for x in module_def['layers'].split(',')]
+                if len(layers) == 1:
+                    layers = [-1] + layers
+                x = sum([layer_outputs[i] for i in layers])
 
             if 'output' in module_def.keys():
                 if int(module_def['output']) == 1:

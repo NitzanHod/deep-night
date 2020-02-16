@@ -14,7 +14,7 @@ from torch.nn import L1Loss
 
 
 if __name__ == '__main__':
-    exp_manager = ExperimentManager('sid')
+    exp_manager = ExperimentManager('test')
     component_names = ['optimizer', 'engines', 'handlers', 'dataloaders', 'lr_scheduler', 'loss_function']
     ex = exp_manager.prepare_run(component_names=component_names)
 
@@ -36,7 +36,6 @@ if __name__ == '__main__':
             model = torch.nn.DataParallel(model)
 
         optimizer = exp_manager.get_optimizer(model)
-        print(optimizer)
 
         scheduler = exp_manager.get_lr_scheduler(optimizer)
 

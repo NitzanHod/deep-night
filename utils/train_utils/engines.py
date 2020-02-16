@@ -48,6 +48,7 @@ class EnginesComponent:
                 optimizer.zero_grad()
                 x, y = prepare_batch(batch, non_blocking=non_blocking)
                 y_pred = model(x)
+                print(y_pred.size(), y.size())
                 loss = loss_fn(y_pred, y)
                 # with half_precision.scale_loss(loss, optimizer) as scaled_loss:
                 # scaled_loss.backward()
