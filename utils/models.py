@@ -56,7 +56,6 @@ def create_modules(module_defs):
 
             modules.add_module('deconv_%d' % i, module)
 
-
         elif module_def['type'] == 'maxpool':
             kernel_size = int(module_def['size'])
             stride = int(module_def['stride'])
@@ -67,6 +66,11 @@ def create_modules(module_defs):
             kernel_size = int(module_def['size'])
             avgpool = nn.AvgPool2d(kernel_size=kernel_size)
             modules.add_module('avgpool_%d' % i, avgpool)
+
+        elif module_def['type'] == 'dropout':
+            p = float(module_def['p'])
+            dropout = nn.Dropout2d(p=p)
+            modules.add_module('dropout_%d' % i, dropout)
 
         elif module_def['type'] == 'upsample':
             # upsample = nn.Upsample(scale_factor=int(module_def['stride']), mode='nearest')  # WARNING: deprecated
@@ -200,7 +204,7 @@ class NNFactory(nn.Module):
             mod_tic = time.time()
             # print(mtype, x.size())
             if mtype in ['upsample', 'maxpool', 'avgpool', 'linear', 'rgb_lab_converter', 'noop', 'convolutional',
-                         'mean', 'deepisp_block', 'pixel_shuffle','linear_packed', 'deconvolutional']:
+                         'mean', 'deepisp_block', 'pixel_shuffle','linear_packed', 'deconvolutional', 'dropout']:
                 x = module(x)
             elif mtype == 'route':
                 layer_i = [int(x) for x in module_def['layers'].split(',')]
