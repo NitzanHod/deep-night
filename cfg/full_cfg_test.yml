@@ -1,6 +1,6 @@
 ---
 train_cfg:
-    model: cfg/model_cfg/orig_u_net.cfg
+    model: cfg/model_cfg/dropout_u_net.cfg
     max_epochs: 3
 
     # Optimizer
