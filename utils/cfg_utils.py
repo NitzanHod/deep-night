@@ -1,8 +1,8 @@
 # Experiment management class, helps injecting sacred configs easily
 from sacred import Experiment, Ingredient
 import yaml
-
-
+import os
+from shutil import copy2
 def _to_camel_case(in_str):
     components = in_str.split('_')
     return ''.join(x.title() for x in components)
@@ -10,18 +10,16 @@ def _to_camel_case(in_str):
 
 class ExperimentManager:
 
-    def __init__(self, config_type: str):
+    def __init__(self, path: str):
         self.component_list = []
-        self.config_type = config_type
-        self.config = self.setup_cfg()
+        self.config_path, self.config = self.setup_cfg(path)
 
-    def setup_cfg(self):
-        if self.config_type in ['sid', 'deepisp', 'test']:
-            path = f'cfg/full_cfg_{self.config_type}.yml'
-            with open(path) as f:
-                return yaml.safe_load(f)
-        else:
-            raise ValueError('Unexpected experiment type! View cfg_utils.py!')
+    def setup_cfg(self, path):
+        if path in ['sid', 'deepisp', 'test']:
+            path = f'cfg/full_cfg_{path}.yml'
+
+        with open(path, 'r') as f:
+            return path, yaml.safe_load(f)
 
     def append(self, name: str):
         new_component = Component(name, self.config)
@@ -38,6 +36,10 @@ class ExperimentManager:
         ex.add_config(self.config)
         return ex
 
+    def store_cfg(self, dirname):
+        _, filename = os.path.split(self.config_path)
+        cfg_store_path = os.path.join(dirname, filename)
+        copy2(self.config_path, cfg_store_path)  # copy file
 
 class Component:
     def __init__(self, component_name, config):

@@ -1,6 +1,6 @@
 # Experiment management class, helps injecting sacred configs easily
 from utils.cfg_utils import ExperimentManager
-from utils.train_utils.custom_error_metrics import PeakSignalToNoiseRatio, MeanDeepISPError, MeanMSSSIMLuminance
+from utils.train_utils.custom_error_metrics import *
 from utils.train_utils.cuda_utils import set_cuda
 
 from utils.models import NNFactory
@@ -24,6 +24,8 @@ if __name__ == '__main__':
         # shutil.rmtree(handlers_cfg['dirname'])
         os.makedirs(handlers_cfg['dirname'], exist_ok=True)
 
+        exp_manager.store_cfg(handlers_cfg['dirname'])
+
         writer = SummaryWriter(handlers_cfg['dirname'])
 
         train_dataloader, eval_dataloader = exp_manager.get_dataloaders()
@@ -43,7 +45,7 @@ if __name__ == '__main__':
 
         metrics = {"L1": MeanAbsoluteError(), "L2": MeanSquaredError(),
                    "PSNR": PeakSignalToNoiseRatio(), "DeepISP_Loss": MeanDeepISPError(),
-                   "Luminance_MS_SSIM": MeanMSSSIMLuminance()}
+                   "Luminance_MS_SSIM": MeanMSSSIMLuminance(),"Perceptual": MeanPerceptualLoss()}
 
         trainer = exp_manager.create_supervised_trainer(model, optimizer, criterion)
         exp_manager.attach_trainer_events(trainer, model, optimizer=optimizer, scheduler=scheduler)
