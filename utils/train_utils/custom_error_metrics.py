@@ -4,7 +4,7 @@ import torch
 
 from ignite.exceptions import NotComputableError
 from ignite.metrics.metric import Metric
-from utils.train_utils.loss_function import l1_msssim, ms_ssim_luminance
+from utils.train_utils.loss_function import l1_msssim, ms_ssim_luminance, VGGPerceptualLoss
 import numpy as np
 
 class PeakSignalToNoiseRatio(Metric):
@@ -71,3 +71,30 @@ class MeanMSSSIMLuminance(Metric):
         if self._num_examples == 0:
             raise NotComputableError('MeanMSSSIMLuminance must have at least one example before it can be computed')
         return self._sum_msssim_luminance / self._num_examples
+
+
+class MeanPerceptualLoss(Metric):
+    """
+    Calculates the deepISP error.
+
+    - `update` must receive output of the form `(y_pred, y)`.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.loss_module = VGGPerceptualLoss()
+
+    def reset(self):
+        self._sum_perceptual_loss = 0.0
+        self._num_examples = 0
+
+    def update(self, output):
+        y_pred, y = output
+        self._sum_perceptual_loss += self.loss_module.forward(y_pred, y)
+        self._num_examples += y.shape[0]
+
+    def compute(self):
+        if self._num_examples == 0:
+            raise NotComputableError('MeanPerceptualLoss must have at least one example before it can be computed')
+        return self._sum_perceptual_loss / self._num_examples
+
