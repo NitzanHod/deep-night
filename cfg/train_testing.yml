@@ -1,7 +1,7 @@
 ---
 train_cfg:
     model: cfg/model_cfg/orig_u_net.cfg
-    max_epochs: 3
+    max_epochs: 20
 
     # Optimizer
     optimizer_type: Adam
