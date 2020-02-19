@@ -181,11 +181,6 @@ class NNFactory(nn.Module):
 
         self.time_list = []
 
-        self.filter_ranks = {}
-        self.reset()
-
-    def reset(self):
-        self.filter_ranks = {}
 
     def forward(self, x, targets=None):
         self.time_list = []
