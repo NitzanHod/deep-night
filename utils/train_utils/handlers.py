@@ -135,15 +135,7 @@ class HandlersComponent:
             return log_validation_results
 
         @ingredient.capture(prefix="handlers_cfg")
-        def add_early_stopping(trainer, evaluator, patience, score_function_name, score_is_loss):
-
-            def score_function(engine):
-                value = engine.state.metrics[score_function_name]
-                if score_is_loss:
-                    value *= -1
-                    # pass
-                return value
-
+        def add_early_stopping(trainer, evaluator, score_function, patience):
             early_stopper = EarlyStopping(patience, score_function, trainer)
             evaluator.add_event_handler(Events.COMPLETED, early_stopper)
 

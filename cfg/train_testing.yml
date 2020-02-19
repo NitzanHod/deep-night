@@ -25,7 +25,7 @@ handlers_cfg:
     patience: 100
     score_function_name: L1
     score_is_loss: True
-    resume: False
+    resume: True
 
 dataloader_cfg:
     train_csv_path: dataset/tiny_Sony_train_list.txt

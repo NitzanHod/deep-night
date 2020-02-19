@@ -22,7 +22,7 @@ handlers_cfg:
     save_interval: 1
     n_saved: 10
     multi_gpu: True
-    patience: 1000
+    patience: 100
     score_function_name: L1
     score_is_loss: True
     resume: True
