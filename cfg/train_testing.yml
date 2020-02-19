@@ -1,7 +1,7 @@
 ---
 train_cfg:
-    model: cfg/model_cfg/dropout_u_net.cfg
-    max_epochs: 3
+    model: cfg/model_cfg/orig_u_net.cfg
+    max_epochs: 20
 
     # Optimizer
     optimizer_type: Adam
@@ -14,7 +14,7 @@ train_cfg:
     step_size: 2000
     gamma: 0.1
     half_precision: True # train with half precision
-    loss_fn: Perceptual # criterion
+    loss_fn: L1 # criterion
 
 handlers_cfg:
     dirname: testing
@@ -22,14 +22,14 @@ handlers_cfg:
     save_interval: 1
     n_saved: 10
     multi_gpu: True
-    patience: 1000
-    score_function_name: Perceptual
+    patience: 100
+    score_function_name: L1
     score_is_loss: True
-    resume: False
+    resume: True
 
 dataloader_cfg:
-    train_csv_path: dataset/med_Sony_train_list.txt
-    eval_csv_path: dataset/med_Sony_val_list.txt
+    train_csv_path: dataset/tiny_Sony_train_list.txt
+    eval_csv_path: dataset/tiny_Sony_val_list.txt
     root_dir: /home/dsteam/Desktop
     subset: 1
     crop_size: 512

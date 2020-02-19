@@ -14,7 +14,7 @@ from torch.nn import L1Loss
 
 
 if __name__ == '__main__':
-    exp_manager = ExperimentManager('test')
+    exp_manager = ExperimentManager('sid')
     component_names = ['optimizer', 'engines', 'handlers', 'dataloaders', 'lr_scheduler', 'loss_function']
     ex = exp_manager.prepare_run(component_names=component_names)
 

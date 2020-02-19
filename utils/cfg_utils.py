@@ -17,8 +17,8 @@ class ExperimentManager:
         self.config_path, self.config = self.setup_cfg(path)
 
     def setup_cfg(self, path):
-        if path in ['sid', 'deepisp', 'test']:
-            path = f'cfg/train_sid_{path}.yml'
+        if path in ['sid', 'deepisp', 'testing']:
+            path = f'cfg/train_{path}.yml'
 
         with open(path, 'r') as f:
             return path, yaml.safe_load(f)

@@ -15,7 +15,7 @@ handlers_cfg:
   filename_prefix: sid_vanilla
   multi_gpu: true
   n_saved: 10
-  patience: 1000
+  patience: 100
   resume: true
   save_interval: 1
   score_function_name: L1

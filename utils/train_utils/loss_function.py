@@ -54,10 +54,10 @@ def l1_msssim(y_pred, y, alpha=0.5, is_lab=False):
 
 
 class VGGPerceptualLoss(torch.nn.Module):
-    def __init__(self, resize=True):
+    def __init__(self, device='cuda:0', resize=True):
         super(VGGPerceptualLoss, self).__init__()
         blocks = []
-        features = torchvision.models.vgg16(pretrained=True).features
+        features = torchvision.models.vgg16(pretrained=True).to(device=device).features
 
         blocks.append(features[:4].eval())
         blocks.append(features[4:9].eval())
@@ -72,8 +72,8 @@ class VGGPerceptualLoss(torch.nn.Module):
 
         self.blocks = torch.nn.ModuleList(blocks)
         self.transform = torch.nn.functional.interpolate
-        self.mean = torch.nn.Parameter(torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1))
-        self.std = torch.nn.Parameter(torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1))
+        self.mean = torch.nn.Parameter(torch.tensor([0.485, 0.456, 0.406], device=device).view(1, 3, 1, 1))
+        self.std = torch.nn.Parameter(torch.tensor([0.229, 0.224, 0.225], device=device).view(1, 3, 1, 1))
         self.resize = resize
 
     def forward(self, input, target):

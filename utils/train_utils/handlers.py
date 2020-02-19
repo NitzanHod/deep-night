@@ -89,7 +89,7 @@ class HandlersComponent:
             trainer.add_event_handler(Events.EPOCH_COMPLETED,
                                       create_log_validation_results(evaluator, eval_dataloader, writer, prefix))
 
-            if prefix == "Val":
+            if prefix == "Eval Val":
                 def score_function(engine):
                     value = engine.state.metrics[score_function_name]
                     if score_is_loss:
@@ -116,7 +116,7 @@ class HandlersComponent:
                 epoch = engine.state.epoch
 
                 evaluator.run(dataloader, 1)
-                if prefix == "Val":
+                if prefix == "Eval Val":
                     pred, gt = evaluator.state.output
 
                     if HandlersComponent.BEFORE_IM_FLAG:
@@ -135,15 +135,7 @@ class HandlersComponent:
             return log_validation_results
 
         @ingredient.capture(prefix="handlers_cfg")
-        def add_early_stopping(trainer, evaluator, score_function, patience, score_function_name, score_is_loss):
-
-            def score_function(engine):
-                value = engine.state.metrics[score_function_name]
-                if score_is_loss:
-                    value *= -1
-                    # pass
-                return value
-
+        def add_early_stopping(trainer, evaluator, score_function, patience):
             early_stopper = EarlyStopping(patience, score_function, trainer)
             evaluator.add_event_handler(Events.COMPLETED, early_stopper)
 
