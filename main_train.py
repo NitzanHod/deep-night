@@ -43,9 +43,11 @@ if __name__ == '__main__':
 
         criterion = L1Loss()
 
-        metrics = {"L1": MeanAbsoluteError(), "L2": MeanSquaredError(),
-                   "PSNR": PeakSignalToNoiseRatio(), "DeepISP_Loss": MeanDeepISPError(),
-                   "Luminance_MS_SSIM": MeanMSSSIMLuminance(),"Perceptual": MeanPerceptualLoss()}
+        # metrics = {"L1": MeanAbsoluteError(), "L2": MeanSquaredError(),
+        #            "PSNR": PeakSignalToNoiseRatio(), "DeepISP_Loss": MeanDeepISPError(),
+        #            "Luminance_MS_SSIM": MeanMSSSIMLuminance(),"Perceptual": MeanPerceptualLoss()}
+
+        metrics = {"L1": MeanAbsoluteError(), "PSNR": PeakSignalToNoiseRatio()}
 
         trainer = exp_manager.create_supervised_trainer(model, optimizer, criterion)
         exp_manager.attach_trainer_events(trainer, model, optimizer=optimizer, scheduler=scheduler)

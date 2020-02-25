@@ -1,7 +1,7 @@
 ---
 train_cfg:
     model: cfg/model_cfg/orig_u_net.cfg
-    max_epochs: 4000
+    max_epochs: 334
 
     # Optimizer
     optimizer_type: Adam
@@ -11,14 +11,14 @@ train_cfg:
 
     # Scheduler:
     scheduler_type: steps
-    step_size: 2000
+    step_size: 167
     gamma: 0.1
     half_precision: True # train with half precision
     loss_fn: L1 # criterion
 
 handlers_cfg:
-    dirname: sid_vanilla
-    filename_prefix: sid_vanilla
+    dirname: sid_vanilla_div12
+    filename_prefix: sid_vanilla_div12
     save_interval: 1
     n_saved: 10
     multi_gpu: True
