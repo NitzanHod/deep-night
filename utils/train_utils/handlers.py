@@ -7,6 +7,8 @@ import torch
 import os
 import numpy as np
 
+from utils.display_utils import sprint
+
 
 class HandlersComponent:
     BEFORE_IM_FLAG = True
@@ -118,14 +120,15 @@ class HandlersComponent:
                 evaluator.run(dataloader, 1)
                 if prefix == "Eval Val":
                     pred, gt = evaluator.state.output
-
+                    # sprint(pred, "Pred")
+                    # sprint(gt, "GT")
                     if HandlersComponent.BEFORE_IM_FLAG:
                         gt_grid = utils.make_grid(gt)
-                        writer.add_image('Before', gt_grid, epoch)
+                        writer.add_image('GT', gt_grid, epoch)
                         HandlersComponent.BEFORE_IM_FLAG = False
 
                     pred_grid = utils.make_grid(pred)
-                    writer.add_image('After', pred_grid, epoch)
+                    writer.add_image('Pred', pred_grid, epoch)
 
                 metrics_dict = evaluator.state.metrics
                 for name, value in metrics_dict.items():
