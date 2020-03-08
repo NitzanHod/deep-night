@@ -1,0 +1,14 @@
+train:
+    model: cfg/model_cfg/orig_u_net.cfg
+    max_epochs: 20
+    # Optimizer
+    optimizer_type: Adam
+    initial_lr: 1e-4
+    momentum: 0.9
+    weight_decay: 0
+    # Scheduler:
+    scheduler_type: steps
+    step_size: 2000
+    gamma: 0.1
+    half_precision: True # train with half precision
+    loss_fn: L1 # criterion

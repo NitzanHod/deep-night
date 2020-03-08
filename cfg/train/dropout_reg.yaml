@@ -1,0 +1,12 @@
+train:
+  gamma: 0.1
+  half_precision: true
+  initial_lr: 1e-4
+  loss_fn: L1
+  max_epochs: 4000
+  model: cfg/model_cfg/dropout_u_net.cfg
+  momentum: 0.9
+  optimizer_type: Adam
+  scheduler_type: steps
+  step_size: 2000
+  weight_decay: 0.1

@@ -11,7 +11,7 @@ from utils.train_utils.dataloaders import raw2np, pack_raw
 dtype, device = set_cuda()
 sample = torch.rand(1, 4, 1024, 512).to(device).type(dtype)
 
-configuration_path = 'cfg/model_cfg/orig_u_net.cfg'
+configuration_path = 'model_cfg/orig_u_net.cfg'
 image_path = 'dataset/Miniset/short/00001_00_0.1s.ARW'
 
 # load an image to a tensor

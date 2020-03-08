@@ -1,0 +1,10 @@
+handlers:
+    dirname: sid_vanilla
+    filename_prefix: sid_vanilla
+    save_interval: 1
+    n_saved: 10
+    multi_gpu: True
+    patience: 1000
+    score_function_name: L1
+    score_is_loss: True
+    resume: True

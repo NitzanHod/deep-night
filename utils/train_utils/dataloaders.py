@@ -63,7 +63,6 @@ def setup_sid_csv(csv_file='/home/dsteam/PycharmProjects/deep-night/dataset/Sony
     return grouped_00_frame
 
 
-
 class SIDDataset(Dataset):
 
     def __init__(self, csv_file, root_dir, sample=None, transform=None, black_level=512, stack_bayer=False, subset=0,
@@ -185,40 +184,34 @@ class SIDDataset(Dataset):
         return result['image'], result['ground_truth']
 
 
-class DataloadersComponent:
+def get_dataloaders(train_csv_path, eval_csv_path, root_dir, black_level, stack_bayer, subset, crop_size,
+                    batch_size,
+                    shuffle, num_workers, pin_memory):
+    train_transform = get_train_transform(crop_size=crop_size, stack_bayer=stack_bayer)
+    eval_transform = get_eval_transform(crop_size=crop_size, stack_bayer=stack_bayer)
 
-    def __init__(self, ingredient):
-        @ingredient.capture(prefix="dataloader_cfg")
-        def get_dataloaders(train_csv_path, eval_csv_path, root_dir, black_level, stack_bayer, subset, crop_size,
-                            batch_size,
-                            shuffle, num_workers, pin_memory):
-            train_transform = get_train_transform(crop_size=crop_size, stack_bayer=stack_bayer)
-            eval_transform = get_eval_transform(crop_size=crop_size, stack_bayer=stack_bayer)
+    train_eval_sample = sample_sid_csv(train_csv_path, store_path=os.path.join(root_dir, 'indices.pkl'))
 
-            train_eval_sample = sample_sid_csv(train_csv_path, store_path=os.path.join(root_dir, 'indices.pkl'))
+    train_dataset = SIDDataset(train_csv_path, root_dir, sample=True, transform=train_transform,
+                               black_level=black_level,
+                               stack_bayer=stack_bayer, subset=subset, name='Train')
 
-            train_dataset = SIDDataset(train_csv_path, root_dir, sample=True, transform=train_transform,
-                                       black_level=black_level,
-                                       stack_bayer=stack_bayer, subset=subset, name='Train')
+    train_eval_dataset = SIDDataset(train_csv_path, root_dir, sample=train_eval_sample,
+                                    transform=eval_transform,
+                                    black_level=black_level,
+                                    stack_bayer=stack_bayer, subset=subset, name='Eval Train')
 
-            train_eval_dataset = SIDDataset(train_csv_path, root_dir, sample=train_eval_sample,
-                                            transform=eval_transform,
-                                            black_level=black_level,
-                                            stack_bayer=stack_bayer, subset=subset, name='Eval Train')
+    val_eval_dataset = SIDDataset(eval_csv_path, root_dir, sample=False, transform=eval_transform,
+                                  black_level=black_level,
+                                  stack_bayer=stack_bayer, subset=subset, name='Eval Val')
 
-            val_eval_dataset = SIDDataset(eval_csv_path, root_dir, sample=False, transform=eval_transform,
-                                          black_level=black_level,
-                                          stack_bayer=stack_bayer, subset=subset, name='Eval Val')
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=shuffle,
+                                  num_workers=num_workers, pin_memory=pin_memory)
 
-            train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=shuffle,
-                                          num_workers=num_workers, pin_memory=pin_memory)
+    train_eval_dataloader = DataLoader(dataset=train_eval_dataset, batch_size=batch_size, shuffle=shuffle,
+                                       num_workers=num_workers, pin_memory=pin_memory)
 
-            train_eval_dataloader = DataLoader(dataset=train_eval_dataset, batch_size=batch_size, shuffle=shuffle,
-                                               num_workers=num_workers, pin_memory=pin_memory)
+    val_eval_dataloader = DataLoader(dataset=val_eval_dataset, batch_size=batch_size, shuffle=shuffle,
+                                     num_workers=num_workers, pin_memory=pin_memory)
 
-            val_eval_dataloader = DataLoader(dataset=val_eval_dataset, batch_size=batch_size, shuffle=shuffle,
-                                             num_workers=num_workers, pin_memory=pin_memory)
-
-            return train_dataloader, train_eval_dataloader, val_eval_dataloader
-
-        self.methods = [get_dataloaders]
+    return train_dataloader, train_eval_dataloader, val_eval_dataloader

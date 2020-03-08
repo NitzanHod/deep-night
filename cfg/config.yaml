@@ -1,0 +1,4 @@
+defaults:
+  - train: vanilla
+  - handlers: vanilla
+  - dataloader: vanilla

@@ -1,0 +1,10 @@
+handlers:
+    dirname: sid_testing
+    filename_prefix: sid_testing
+    save_interval: 1
+    n_saved: 10
+    multi_gpu: True
+    patience: 100
+    score_function_name: L1
+    score_is_loss: True
+    resume: True

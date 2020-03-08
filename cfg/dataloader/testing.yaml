@@ -1,0 +1,14 @@
+dataloader_cfg:
+    train_csv_path: dataset/tiny_Sony_train_list.txt
+    eval_csv_path: dataset/tiny_Sony_val_list.txt
+    root_dir: /home/dsteam/Desktop
+    subset: 1
+    crop_size: 512
+    batch_size: 2 # see https://github.com/cchen156/Learning-to-See-in-the-Dark/issues/16
+    shuffle: True
+    num_workers: 0
+    pin_memory: True
+
+    # SID
+    black_level: 512
+    stack_bayer: True
