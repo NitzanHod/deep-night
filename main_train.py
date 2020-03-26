@@ -14,7 +14,6 @@ import torch
 from tensorboardX import SummaryWriter
 from torch.nn import L1Loss
 
-
 if __name__ == '__main__':
     singleton = ExperimentManager('cfg/train_finetune.yml')
 
@@ -36,6 +35,7 @@ if __name__ == '__main__':
 
     ex.add_config(singleton.config)
 
+
     @ex.automain
     def run(handlers_cfg, train_cfg):
 
@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
         writer = SummaryWriter(handlers_cfg['dirname'])
 
-        train_dataloader,  train_eval_dataloader, val_eval_dataloader = get_dataloaders()
+        train_dataloader, train_eval_dataloader, val_eval_dataloader = get_dataloaders()
 
         _, device = set_cuda()
 
@@ -78,5 +78,9 @@ if __name__ == '__main__':
 
         val_evaluator = create_supervised_evaluator(model, metrics=metrics)
         attach_eval_events(trainer, model, val_evaluator, val_eval_dataloader, writer, "Eval Val")
-
-        trainer.run(train_dataloader, train_cfg['max_epochs'])
+        try:
+            trainer.run(train_dataloader, train_cfg['max_epochs'])
+        except KeyboardInterrupt:
+            print('Done training!')
+            writer.close()  # cleaning
+            print('Cleaned! END')

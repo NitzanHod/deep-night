@@ -17,7 +17,7 @@ dataloader_ingredient = ExperimentManager().get_ingredient('dataloader')
 
 
 def raw2np(raw, black_level):
-    im = raw.raw_image_visible.astype(np.float16)
+    im = raw.raw_image_visible.astype(np.float32)
     im = np.maximum(im - black_level, 0) / (16383 - black_level)  # subtract the black level
     im = np.expand_dims(im, axis=2)
     return im
@@ -64,6 +64,7 @@ def setup_sid_csv(csv_file='/home/dsteam/PycharmProjects/deep-night/dataset/Sony
         grouped_00_frame_to_save[1] = grouped_00_frame[1].apply(lambda x: '$'.join(x))
         grouped_00_frame_to_save.to_csv(store_path, sep=' ', header=None, index=False)
     return grouped_00_frame
+
 
 # class SIDDataset(Dataset):
 #
@@ -188,7 +189,8 @@ def setup_sid_csv(csv_file='/home/dsteam/PycharmProjects/deep-night/dataset/Sony
 
 class SIDDataset(Dataset):
 
-    def __init__(self, csv_file, root_dir, transform=None, black_level=512, sample=False, name='dataset', stack_bayer=False, subset=0):
+    def __init__(self, csv_file, root_dir, transform=None, black_level=512, sample=False, name='dataset',
+                 stack_bayer=False, subset=0):
         """
         Args:
             csv_file (string): Path to the csv file with annotations.
@@ -218,22 +220,22 @@ class SIDDataset(Dataset):
         ratio = min(gt_exposure / im_exposure, 300)
 
         if im_path in self.im_dict.keys():
-            im = self.im_dict[im_path] * ratio
+            im = self.im_dict[im_path]
         else:
             raw = rawpy.imread(im_path)
             im = raw2np(raw, self.black_level)
             if self.stack_bayer:
                 im = pack_raw(im)
             self.im_dict[im_path] = im
-            im *= ratio
-        im = im.astype(np.float32)
 
+        im = im * ratio
+        im = im.astype(np.float32)
         if gt_path in self.gt_dict.keys():
             gt = self.gt_dict[gt_path]
         else:
             gt_raw = rawpy.imread(gt_path)
             gt = gt_raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=True, output_bps=16)
-            gt = np.float16(gt / 65535.0)
+            gt = np.float32(gt / 65535.0)
             self.gt_dict[gt_path] = gt
         gt = gt.astype(np.float32)
 
@@ -246,6 +248,7 @@ class SIDDataset(Dataset):
             sample = self.transform(sample)
 
         return sample['image'], sample['ground_truth']
+
 
 @dataloader_ingredient.capture(prefix="dataloader_cfg")
 def get_dataloaders(train_csv_path, eval_csv_path, root_dir, black_level, stack_bayer, subset, crop_size,

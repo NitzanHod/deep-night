@@ -11,7 +11,7 @@ from utils.cfg_utils import ExperimentManager
 
 handlers_ingredient = ExperimentManager().get_ingredient('handlers')
 
-BEFORE_IM_FLAG = True
+GT_ADDED_FLAG = True
 
 
 @handlers_ingredient.capture(prefix="handlers_cfg")
@@ -122,14 +122,12 @@ def create_log_validation_results(evaluator, dataloader, writer, prefix):
 
         evaluator.run(dataloader, 1)
         if prefix == "Eval Val":
-            global BEFORE_IM_FLAG
+            global GT_ADDED_FLAG
             pred, gt = evaluator.state.output
-            # sprint(pred, "Pred")
-            # sprint(gt, "GT")
-            if BEFORE_IM_FLAG:
+            if GT_ADDED_FLAG:
                 gt_grid = utils.make_grid(gt)
                 writer.add_image('GT', gt_grid, epoch)
-                BEFORE_IM_FLAG = False
+                GT_ADDED_FLAG = False
 
             pred_grid = utils.make_grid(pred)
             writer.add_image('Pred', pred_grid, epoch)
@@ -137,7 +135,6 @@ def create_log_validation_results(evaluator, dataloader, writer, prefix):
         metrics_dict = evaluator.state.metrics
         for name, value in metrics_dict.items():
             writer.add_scalars(name, {prefix: value}, engine.state.epoch)
-            # print(name, prefix, engine.state.epoch)
 
     return log_validation_results
 

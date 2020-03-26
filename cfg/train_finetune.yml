@@ -2,24 +2,24 @@
 train_cfg:
     model: cfg/model_cfg/orig_u_net.cfg
     weights: checkpoint_sony_e4000.pth
-    max_epochs: 10
+    max_epochs: 50
 
     # Optimizer
     optimizer_type: Adam
-    initial_lr: 1e-6 #changed for finetuning. play with this.
-    momentum: 0.3
+    initial_lr: 1e-4 #changed for finetuning. play with this.
+    momentum: 0.9
     weight_decay: 0
 
     # Scheduler:
     scheduler_type: steps
     step_size: 2000
-    gamma: 0.1
+    gamma: 0
     half_precision: True # train with half precision
     loss_fn: L1 # criterion
 
 handlers_cfg:
-    dirname: sid_finetune
-    filename_prefix: sid_finetune
+    dirname: a
+    filename_prefix: a
     save_interval: 1
     n_saved: 10
     multi_gpu: True
