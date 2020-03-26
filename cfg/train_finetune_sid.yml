@@ -1,0 +1,44 @@
+---
+train_cfg:
+    model: cfg/model_cfg/orig_u_net.cfg
+    weights: checkpoint_sony_e4000.pth
+    max_epochs: 10
+
+    # Optimizer
+    optimizer_type: Adam
+    initial_lr: 1e-6 #changed for finetuning. play with this.
+    momentum: 0.3
+    weight_decay: 0
+
+    # Scheduler:
+    scheduler_type: steps
+    step_size: 2000
+    gamma: 0.1
+    half_precision: True # train with half precision
+    loss_fn: L1 # criterion
+
+handlers_cfg:
+    dirname: sid_finetune
+    filename_prefix: sid_finetune
+    save_interval: 1
+    n_saved: 10
+    multi_gpu: True
+    patience: 1000
+    score_function_name: L1
+    score_is_loss: True
+    resume: False
+
+dataloader_cfg:
+    train_csv_path: dataset/tiny_Sony_train_list.txt
+    eval_csv_path: dataset/tiny_Sony_train_list.txt # overfit on purpose - testing
+    root_dir: /home/dsteam/Desktop
+    subset: 1
+    crop_size: 512
+    batch_size: 2 # see https://github.com/cchen156/Learning-to-See-in-the-Dark/issues/16
+    shuffle: True
+    num_workers: 0
+    pin_memory: True
+
+    # SID
+    black_level: 512
+    stack_bayer: True
