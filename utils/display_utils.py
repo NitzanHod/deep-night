@@ -9,3 +9,8 @@ def sprint(tensor, name=None):
     for k, v in params.items():
         res += ' || ' + str(k) + ': ' + str(v)
     print(res)
+
+
+def _to_camel_case(in_str):
+    components = in_str.split('_')
+    return ''.join(x.title() for x in components)

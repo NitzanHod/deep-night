@@ -1,23 +1,23 @@
 import utils.train_utils.ms_ssim as ms_ssim
 import torch
+import torch.nn
 import torchvision
 from utils.rgb2lab import rgb_to_lab
+from utils.cfg_utils import ExperimentManager
+
+loss_ingredient = ExperimentManager().get_ingredient('loss_function')
 
 
-class LossFunctionComponent:
+@loss_ingredient.capture(prefix="train_cfg")
+def get_loss_function(loss_fn):
+    loss_fn = str(loss_fn).strip().lower()
+    if loss_fn == "deepisploss":
+        return l1_msssim
+    if loss_fn == "l1":
+        return torch.nn.L1Loss()
+    if loss_fn == "perceptual":
+        return VGGPerceptualLoss()
 
-    def __init__(self, ingredient):
-        @ingredient.capture(prefix="train_cfg")
-        def get_loss_function(loss_fn):
-            loss_fn = str(loss_fn).strip().lower()
-            if loss_fn == "deepisploss":
-                return l1_msssim
-            if loss_fn == "l1":
-                return torch.nn.L1Loss()
-            if loss_fn == "perceptual":
-                return VGGPerceptualLoss()
-
-        self.methods = [get_loss_function]
 
 def ms_ssim_luminance(y_pred, y, is_rgb):
     if is_rgb:
