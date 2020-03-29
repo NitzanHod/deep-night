@@ -60,7 +60,6 @@ if __name__ == '__main__':
 
         optimizer = get_optimizer(model)
 
-        scheduler = get_lr_scheduler(optimizer)
 
         criterion = get_loss_function()
 
@@ -71,12 +70,13 @@ if __name__ == '__main__':
         metrics = {"L1": MeanAbsoluteError(), "PSNR": PeakSignalToNoiseRatio()}
 
         trainer = create_supervised_trainer(model, optimizer, criterion)
-        attach_trainer_events(trainer, model, optimizer=optimizer, scheduler=scheduler)
-
         train_evaluator = create_supervised_evaluator(model, metrics=metrics)
-        attach_eval_events(trainer, model, train_evaluator, train_eval_dataloader, writer, "Eval Train")
-
         val_evaluator = create_supervised_evaluator(model, metrics=metrics)
+
+        scheduler = get_lr_scheduler(optimizer, val_evaluator)
+
+        attach_trainer_events(trainer, model, optimizer=optimizer, scheduler=scheduler)
+        attach_eval_events(trainer, model, train_evaluator, train_eval_dataloader, writer, "Eval Train")
         attach_eval_events(trainer, model, val_evaluator, val_eval_dataloader, writer, "Eval Val")
         try:
             trainer.run(train_dataloader, train_cfg['max_epochs'])

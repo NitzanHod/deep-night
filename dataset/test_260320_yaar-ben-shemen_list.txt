@@ -1,0 +1,8 @@
+./short/04185_00_1s.ARW ./long/04184_00_25s.ARW
+./short/04186_00_3.2s.ARW ./long/04184_00_25s.ARW
+./short/04188_00_1s.ARW ./long/04187_00_40s.ARW
+./short/04189_00_3.2s.ARW ./long/04187_00_40s.ARW
+./short/04191_00_1s.ARW ./long/04190_00_51s.ARW
+./short/04192_00_3.2s.ARW ./long/04190_00_51s.ARW
+./short/04199_00_1s.ARW ./long/04198_00_15s.ARW
+./short/04200_00_3.2s.ARW ./long/04198_00_15s.ARW

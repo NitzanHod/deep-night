@@ -2,7 +2,7 @@
 train_cfg:
     model: cfg/model_cfg/orig_u_net.cfg
     weights: checkpoint_sony_e4000.pth
-    max_epochs: 50
+    max_epochs: 1000
 
     # Optimizer
     optimizer_type: Adam
@@ -11,27 +11,30 @@ train_cfg:
     weight_decay: 0
 
     # Scheduler:
-    scheduler_type: steps
-    step_size: 2000
-    gamma: 0
+    scheduler_type: plateau
+    factor: 0.1
+    patience: 60
     half_precision: True # train with half precision
     loss_fn: L1 # criterion
+    verbose: True
 
 handlers_cfg:
-    dirname: a
-    filename_prefix: a
+    dirname: m_0.9_lr_1e-4_p_60_f_0.1_adam
+    filename_prefix: m_0.9_lr_1e-4_p_60_f_0.1_adam
     save_interval: 1
-    n_saved: 10
+    n_saved: 2
     multi_gpu: True
+    # Early Stopping
     patience: 1000
     score_function_name: L1
     score_is_loss: True
     resume: False
 
 dataloader_cfg:
-    train_csv_path: dataset/tiny_Sony_train_list.txt
-    eval_csv_path: dataset/tiny_Sony_train_list.txt # overfit on purpose - testing
-    root_dir: /home/dsteam/Desktop
+    train_csv_path: dataset/train_260320_yaar-ben-shemen_list.txt
+    val_csv_path: dataset/test_260320_yaar-ben-shemen_list.txt
+    root_dir: /home/dsteam/Desktop/mantis_data/sony_260320_yaar-ben-shemen
+
     subset: 1
     crop_size: 512
     batch_size: 2 # see https://github.com/cchen156/Learning-to-See-in-the-Dark/issues/16

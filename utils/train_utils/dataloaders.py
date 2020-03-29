@@ -251,7 +251,7 @@ class SIDDataset(Dataset):
 
 
 @dataloader_ingredient.capture(prefix="dataloader_cfg")
-def get_dataloaders(train_csv_path, eval_csv_path, root_dir, black_level, stack_bayer, subset, crop_size,
+def get_dataloaders(train_csv_path, val_csv_path, root_dir, black_level, stack_bayer, subset, crop_size,
                     batch_size,
                     shuffle, num_workers, pin_memory):
     train_transform = get_train_transform(crop_size=crop_size, stack_bayer=stack_bayer)
@@ -268,7 +268,7 @@ def get_dataloaders(train_csv_path, eval_csv_path, root_dir, black_level, stack_
                                     black_level=black_level,
                                     stack_bayer=stack_bayer, subset=subset, name='Eval Train')
 
-    val_eval_dataset = SIDDataset(eval_csv_path, root_dir, sample=False, transform=eval_transform,
+    val_eval_dataset = SIDDataset(val_csv_path, root_dir, sample=False, transform=eval_transform,
                                   black_level=black_level,
                                   stack_bayer=stack_bayer, subset=subset, name='Eval Val')
 

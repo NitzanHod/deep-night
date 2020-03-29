@@ -8,6 +8,7 @@ import os
 import numpy as np
 
 from utils.cfg_utils import ExperimentManager
+from utils.train_utils.lr_scheduler import ReduceLROnPlateauScheduler
 
 handlers_ingredient = ExperimentManager().get_ingredient('handlers')
 
@@ -47,7 +48,13 @@ def resume_last_checkpoint(to_save, dirname, filename_prefix):
 
 @handlers_ingredient.capture(prefix="handlers_cfg")
 def _prepare_checkpoint(trainer, model, optimizer, scheduler, dirname, filename_prefix, n_saved, multi_gpu):
-    to_save = {'trainer': trainer, 'optimizer': optimizer, 'scheduler': scheduler}
+    to_save = {'trainer': trainer, 'optimizer': optimizer}
+
+    if type(scheduler) != ReduceLROnPlateauScheduler:
+        to_save['scheduler'] = scheduler
+    else:
+        # TODO: Attempt to store ReduceLROnPlateauScheduler causes infinite loop. find out to allow training resumption
+        pass
 
     if multi_gpu:
         to_save['model'] = model.module
@@ -137,6 +144,25 @@ def create_log_validation_results(evaluator, dataloader, writer, prefix):
             writer.add_scalars(name, {prefix: value}, engine.state.epoch)
 
     return log_validation_results
+
+
+def create_log_train_params(param_list, optimizer, writer):
+    """
+    Write optimizer parameters to tensorboard on each epoch, such as learning rate
+    :param param_list: names of parameters to be displayed
+    :param optimizer:
+    :param writer:
+    :return:
+    """
+
+    prefix = "Trainer"
+
+    def log_train_params(engine):
+        for name in param_list:
+            if hasattr(optimizer, name):
+                writer.add_scalars(name, {prefix: getattr(optimizer, name)}, engine.state.epoch)
+
+    return log_train_params
 
 
 @handlers_ingredient.capture(prefix="handlers_cfg")

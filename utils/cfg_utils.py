@@ -19,6 +19,7 @@ class ExperimentManager(metaclass=Singleton):
     def __init__(self, path: str = ''):
         self.config_path, self.config = self.setup_cfg(path)
 
+
     def setup_cfg(self, path):
         if path in ['sid', 'testing', 'finetune']:
             path = f'cfg/train_{path}.yml'
@@ -29,6 +30,7 @@ class ExperimentManager(metaclass=Singleton):
     def store_cfg(self, dirname):
         _, filename = os.path.split(self.config_path)
         cfg_store_path = os.path.join(dirname, filename)
+        print('Copying cfg file: ', self.config_path, 'to', cfg_store_path, '.')
         copy2(self.config_path, cfg_store_path)  # copy file
 
     @staticmethod
